@@ -1,20 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import EditHotel from './components/EditHotel';
 import CreateHotel from './components/CreateHotel';
 import HotelDetails from './components/HotelDetails';
-
 import API from '../../../utils/api';
 import Loader from '../../../components/common/Loader';
+import { LoadingContext } from '../../../contexts/ContextCreator';
 
 const MyHotel = () => {
   const [hotel, setHotel] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const { isLoading, setIsLoading } = useContext(LoadingContext);
 
   useEffect(() => {
     const fetchHotelDetails = async () => {
+      setIsLoading(true);
       try {
-        setLoading(true);
         const res = await API.get('/owner/hotel-description');
         if (res.data.success && res.data.data) {
           setHotel(res.data.data);
@@ -25,12 +25,12 @@ const MyHotel = () => {
           error.response?.data || error.message
         );
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     fetchHotelDetails();
-  }, []);
+  }, [setIsLoading]);
 
   const handleCreate = (newHotel) => {
     setHotel(newHotel);
@@ -45,7 +45,7 @@ const MyHotel = () => {
   const handleEdit = () => setIsEditing(true);
   const handleCancelEdit = () => setIsEditing(false);
 
-  if (loading) return <Loader fullScreen={true} />;
+  if (isLoading) return <Loader fullScreen={true} />;
 
   return (
     <main className="min-h-screen bg-gray-100/80">
@@ -71,7 +71,7 @@ const MyHotel = () => {
               <HotelDetails
                 hotel={hotel}
                 onEdit={handleEdit}
-                loading={loading}
+                isLoading={isLoading}
               />
             </div>
           )}

@@ -1,7 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { useContext, useMemo } from 'react';
-import { LoginContext } from '../../contexts/LoginProvider/LoginContext';
 import { HiBuildingOffice2 } from 'react-icons/hi2';
 import {
   MdBarChart,
@@ -15,6 +14,7 @@ import {
   MdTableBar,
 } from 'react-icons/md';
 import { LuCircleUser } from 'react-icons/lu';
+import { LoginContext } from '../../contexts/ContextCreator';
 
 const Navbar = ({ brandLink = '/' }) => {
   const { loggedInUser, handleLogout } = useContext(LoginContext);

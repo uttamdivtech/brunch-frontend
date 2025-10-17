@@ -1,10 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { MagnifyingGlassIcon, PlusIcon } from '@heroicons/react/24/outline';
 import MenuList from './MenuList';
 import CreateEditMenu from './CreateEditMenu';
 import DeleteConfirm from './DeleteConfirm';
 import API from '../../../../utils/api';
 import Loader from '../../../../components/common/Loader';
+import { toast } from 'react-toastify';
+import {
+  LoadingContext,
+  SubmittingContext,
+} from '../../../../contexts/ContextCreator';
 
 const MenuManagement = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -14,13 +19,13 @@ const MenuManagement = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [formType, setFormType] = useState('create');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { isLoading, setIsLoading } = useContext(LoadingContext);
+  const { isSubmitting, setIsSubmitting } = useContext(SubmittingContext);
 
   useEffect(() => {
     const fetchHotelDetails = async () => {
+      setIsLoading(true);
       try {
-        setLoading(true);
         const menuRes = await API.get('/menu/all-menus');
         if (menuRes.data.success && menuRes.data.data) {
           setMenuItems(menuRes.data.data);
@@ -31,11 +36,11 @@ const MenuManagement = () => {
           error.response?.data || error.message
         );
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
     fetchHotelDetails();
-  }, []);
+  }, [setIsLoading]);
 
   const filteredMenuItems = menuItems.filter((item) => {
     const name = item?.name || '';
@@ -97,13 +102,41 @@ const MenuManagement = () => {
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!selectedItem) return;
-    setMenuItems((prev) =>
-      prev.filter((item) => item._id !== selectedItem._id)
-    );
-    setIsDeleteModalOpen(false);
-    setSelectedItem(null);
+    setIsSubmitting(true);
+    try {
+      const deleteImageRes = await API.delete(
+        `/image/image-delete/${selectedItem.images[0].imageId}?type=menu`
+      );
+      const deleteMenuRes = await API.delete(
+        `/menu/menus-delete/${selectedItem._id}`
+      );
+
+      console.log(deleteMenuRes, deleteImageRes, 'deleteMenuRes');
+
+      setMenuItems((prev) =>
+        prev.filter((item) => {
+          return item._id !== selectedItem._id;
+        })
+      );
+      toast.success(
+        deleteMenuRes.data.message || 'Menu item deleted successfully!'
+      );
+      setIsDeleteModalOpen(false);
+      setSelectedItem(null);
+    } catch (error) {
+      console.error(
+        'Error deleting menu item:',
+        error.response?.data || error.message
+      );
+      toast.error(
+        error.response?.data?.message ||
+          'Something went wrong. Please try again.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const closeCreateEditModal = () => {
@@ -116,7 +149,7 @@ const MenuManagement = () => {
     setSelectedItem(null);
   };
 
-  if (loading) return <Loader fullScreen={true} />;
+  if (isLoading) return <Loader fullScreen={true} />;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -184,6 +217,7 @@ const MenuManagement = () => {
           onClose={closeDeleteModal}
           itemName={selectedItem?.name}
           onConfirm={handleDelete}
+          isSubmitting={isSubmitting}
         />
 
         {/* Empty State */}

@@ -6,7 +6,7 @@ import { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import API from '../utils/api';
-import { LoginContext } from '../contexts/LoginProvider/LoginContext';
+import { LoginContext, SubmittingContext } from '../contexts/ContextCreator';
 
 const SignIn = ({
   isModalOpen,
@@ -15,27 +15,24 @@ const SignIn = ({
   switchToForgotPassword,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const { isSubmitting, setIsSubmitting } = useContext(SubmittingContext);
   const { handleLogin } = useContext(LoginContext);
+
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: { emailOrUsername: '', password: '' },
     validationSchema: signInSchema,
     onSubmit: async (values) => {
-      setLoading(true);
+      setIsSubmitting(true);
       try {
         const response = await API.post('/user/login', values);
-
-        // Store JWT + user info
         handleLogin(response.data.user, response.data.user.token);
-
         if (response.data.user.role === 'user') {
           navigate('/user/dashboard');
         } else if (response.data.user.role === 'owner') {
           navigate('/owner/dashboard');
         }
-
         setIsModalOpen(false);
       } catch (error) {
         console.error('Login error:', error.response?.data || error.message);
@@ -43,7 +40,7 @@ const SignIn = ({
           error.response?.data?.message || 'Invalid email or password!'
         );
       } finally {
-        setLoading(false);
+        setIsSubmitting(false);
       }
     },
   });
@@ -142,9 +139,9 @@ const SignIn = ({
               <button
                 type="submit"
                 className="cursor-pointer w-full rounded-md py-3 text-white font-semibold shadow-md bg-(--color-primary) hover:bg-(--color-secondary) transition"
-                disabled={loading}
+                disabled={isSubmitting}
               >
-                {loading ? 'Signing In...' : 'Sign In'}
+                {isSubmitting ? 'Signing In...' : 'Sign In'}
               </button>
             </form>
 

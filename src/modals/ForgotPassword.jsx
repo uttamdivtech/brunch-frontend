@@ -4,15 +4,17 @@ import { useFormik } from 'formik';
 import { forgotPasswordSchema } from '../schemas/YupValidationSchema';
 import API from '../utils/api';
 import { toast } from 'react-toastify';
-import { useState } from 'react';
+import { useContext } from 'react';
+import { SubmittingContext } from '../contexts/ContextCreator';
 
 const ForgotPassword = ({ isModalOpen, setIsModalOpen, switchToSignIn }) => {
-  const [loading, setLoading] = useState(false);
+  const { isSubmitting, setIsSubmitting } = useContext(SubmittingContext);
+
   const formik = useFormik({
     initialValues: { email: '' },
     validationSchema: forgotPasswordSchema,
     onSubmit: async (values) => {
-      setLoading(true);
+      setIsSubmitting(true);
       try {
         const response = await API.post('/user/forgot-password', values);
         toast.success(
@@ -29,7 +31,7 @@ const ForgotPassword = ({ isModalOpen, setIsModalOpen, switchToSignIn }) => {
             'Something went wrong. Please try again.'
         );
       } finally {
-        setLoading(false);
+        setIsSubmitting(false);
       }
     },
   });
@@ -94,9 +96,9 @@ const ForgotPassword = ({ isModalOpen, setIsModalOpen, switchToSignIn }) => {
             <button
               type="submit"
               className="cursor-pointer w-full rounded-md py-3 text-white font-semibold shadow-md bg-(--color-primary) hover:bg-(--color-secondary) transition"
-              disabled={loading}
+              disabled={isSubmitting}
             >
-              {loading ? 'Sending Link...' : 'Send Reset Link'}
+              {isSubmitting ? 'Sending Link...' : 'Send Reset Link'}
             </button>
           </form>
 

@@ -17,7 +17,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { LoginContext } from '../../contexts/LoginProvider/LoginContext';
+import { LoginContext } from '../../contexts/ContextCreator';
 
 // Register Chart.js components
 ChartJS.register(

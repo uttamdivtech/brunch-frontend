@@ -6,8 +6,7 @@ import {
   MdFavorite,
   MdPerson,
 } from 'react-icons/md';
-
-import { LoginContext } from '../../contexts/LoginProvider/LoginContext';
+import { LoginContext } from '../../contexts/ContextCreator';
 
 export const UserDashboard = () => {
   const [recentOrders, setRecentOrders] = useState([]);

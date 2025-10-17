@@ -1,29 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import API from '../../../utils/api';
 import Loader from '../../../components/common/Loader';
 import MenuList from '../../../dashboards/OwnerDashboard/MyMenu/components/MenuList';
+import { LoadingContext } from '../../../contexts/ContextCreator';
 
 const UserMenu = () => {
   const [menuItems, setMenuItems] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { isLoading, setIsLoading } = useContext(LoadingContext);
 
   useEffect(() => {
     const fetchMenuItems = async () => {
+      setIsLoading(true);
       try {
         const userMenuRes = await API.get('/menu/all-menus');
         setMenuItems(userMenuRes.data.data);
       } catch (err) {
         setError(err.message);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     fetchMenuItems();
-  }, []); // Empty dependency array means this runs once on mount
+  }, [setIsLoading]); // Empty dependency array means this runs once on mount
 
-  if (loading) return <Loader fullScreen={true} />;
+  if (isLoading) return <Loader fullScreen={true} />;
 
   if (error) {
     return (

@@ -1,11 +1,12 @@
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 import { useFormik } from 'formik';
 import { IoClose, IoEye, IoEyeOff } from 'react-icons/io5';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { ownerSignUpSchema } from '../schemas/YupValidationSchema';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import API from '../utils/api';
+import { SubmittingContext } from '../contexts/ContextCreator';
 
 export const OwnerSignUp = ({
   isModalOpen,
@@ -14,7 +15,8 @@ export const OwnerSignUp = ({
   switchToSignUp,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { isSubmitting, setIsSubmitting } = useContext(SubmittingContext);
+
   const navigate = useNavigate();
 
   const formik = useFormik({
@@ -29,10 +31,9 @@ export const OwnerSignUp = ({
     },
     validationSchema: ownerSignUpSchema,
     onSubmit: async (values) => {
-      setLoading(true);
+      setIsSubmitting(true);
       try {
         const response = await API.post('/user/signup', values);
-        sessionStorage.setItem('token', response.data.user.token);
         toast.success(
           response.data.message || 'Owner registration successful!'
         );
@@ -50,7 +51,7 @@ export const OwnerSignUp = ({
             'Something went wrong. Please try again.'
         );
       } finally {
-        setLoading(false);
+        setIsSubmitting(false);
       }
     },
   });
@@ -145,9 +146,9 @@ export const OwnerSignUp = ({
               <button
                 type="submit"
                 className="cursor-pointer w-full rounded-md py-3 text-white font-semibold shadow-md bg-(--color-primary) hover:bg-(--color-secondary) focus:outline-none focus:ring-4 focus:ring-[#7e292894] transition disabled:opacity-50"
-                disabled={loading}
+                disabled={isSubmitting}
               >
-                {loading ? 'Signing up...' : 'Sign Up as Owner'}
+                {isSubmitting ? 'Signing up...' : 'Sign Up as Owner'}
               </button>
             </form>
 

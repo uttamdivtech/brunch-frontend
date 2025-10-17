@@ -1,2 +1,2 @@
-import { LoginProvider } from './LoginContext';
+import { LoginProvider } from './LoginProvider';
 export default LoginProvider;

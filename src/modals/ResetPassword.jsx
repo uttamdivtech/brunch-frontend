@@ -4,21 +4,23 @@ import { toast } from 'react-toastify';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import API from '../utils/api';
 import { resetPasswordSchema } from '../schemas/YupValidationSchema';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { IoEye, IoEyeOff } from 'react-icons/io5';
+import { SubmittingContext } from '../contexts/ContextCreator';
 
 export const ResetPassword = () => {
   const { token } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(true);
-  const [loading, setLoading] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const { isSubmitting, setIsSubmitting } = useContext(SubmittingContext);
+
   const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: { password: '', confirmPassword: '' },
     validationSchema: resetPasswordSchema,
     onSubmit: async (values) => {
-      setLoading(true);
+      setIsSubmitting(true);
       try {
         const response = await API.post(
           `/user/reset-password/${token}`,
@@ -36,7 +38,7 @@ export const ResetPassword = () => {
           error.response?.data?.message || 'Something went wrong. Try again.'
         );
       } finally {
-        setLoading(false);
+        setIsSubmitting(false);
       }
     },
   });
@@ -130,9 +132,9 @@ export const ResetPassword = () => {
             <button
               type="submit"
               className="cursor-pointer w-full py-3 bg-(--color-primary) hover:bg-(--color-secondary) text-white font-semibold rounded-md transition"
-              disabled={loading}
+              disabled={isSubmitting}
             >
-              {loading ? 'Resetting Password...' : 'Reset Password'}
+              {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
             </button>
           </form>
           <div className="mt-8 text-center">

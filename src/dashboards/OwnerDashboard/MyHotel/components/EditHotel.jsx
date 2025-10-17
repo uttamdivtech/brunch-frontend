@@ -1,12 +1,15 @@
 import { useFormik } from 'formik';
 import { MdStar } from 'react-icons/md';
 import { hotelSchema } from '../../../../schemas/YupValidationSchema';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import API from '../../../../utils/api';
 import { toast } from 'react-toastify';
+import { SubmittingContext } from '../../../../contexts/ContextCreator';
 
 const EditHotel = ({ hotel, onSubmit, onCancel }) => {
   const [preview, setPreview] = useState(null);
+  const { isSubmitting, setIsSubmitting } = useContext(SubmittingContext);
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -17,7 +20,8 @@ const EditHotel = ({ hotel, onSubmit, onCancel }) => {
     validationSchema: hotelSchema,
     validateOnChange: true,
     validateOnBlur: true,
-    onSubmit: async (values, { setSubmitting }) => {
+    onSubmit: async (values) => {
+      setIsSubmitting(true);
       try {
         const { images, ...payload } = values;
 
@@ -68,7 +72,7 @@ const EditHotel = ({ hotel, onSubmit, onCancel }) => {
         );
         toast.error(error.response?.data?.message || 'Something went wrong');
       } finally {
-        setSubmitting(false);
+        setIsSubmitting(false);
         onCancel();
       }
     },
@@ -82,7 +86,6 @@ const EditHotel = ({ hotel, onSubmit, onCancel }) => {
     handleChange,
     handleSubmit,
     isValid,
-    isSubmitting,
     setFieldValue,
     setFieldTouched,
     setFieldError,
@@ -474,7 +477,7 @@ const EditHotel = ({ hotel, onSubmit, onCancel }) => {
             disabled={!isValid || isSubmitting}
             className="inline-flex flex-1 items-center justify-center rounded-xl bg-[var(--color-primary)] hover:bg-[var(--color-secondary)] px-4 py-2 font-medium text-white shadow-md transition"
           >
-            Save Changes
+            {isSubmitting ? 'Submitting...' : 'Update Hotel'}
           </button>
         </div>
       </form>

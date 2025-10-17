@@ -2,10 +2,11 @@ import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 import { IoClose, IoEye, IoEyeOff } from 'react-icons/io5';
 import { useFormik } from 'formik';
 import { signUpSchema } from '../schemas/YupValidationSchema';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import API from '../utils/api';
+import { SubmittingContext } from '../contexts/ContextCreator';
 
 const SignUp = ({
   isModalOpen,
@@ -15,7 +16,7 @@ const SignUp = ({
 }) => {
   const navigate = useNavigate();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { isSubmitting, setIsSubmitting } = useContext(SubmittingContext);
 
   const formik = useFormik({
     initialValues: {
@@ -27,10 +28,9 @@ const SignUp = ({
     },
     validationSchema: signUpSchema,
     onSubmit: async (values) => {
-      setLoading(true);
+      setIsSubmitting(true);
       try {
         const response = await API.post('/user/signup', values);
-        sessionStorage.setItem('token', response.data.user.token);
         toast.success(response.data.message || 'User registration successful!');
         if (response.data.user.role === 'user') {
           navigate('/user/dashboard');
@@ -45,7 +45,7 @@ const SignUp = ({
             'Something went wrong. Please try again.'
         );
       } finally {
-        setLoading(false);
+        setIsSubmitting(false);
       }
     },
   });
@@ -130,9 +130,9 @@ const SignUp = ({
               <button
                 type="submit"
                 className="cursor-pointer w-full rounded-md py-3 text-white font-semibold shadow-md bg-(--color-primary) hover:bg-(--color-secondary) transition"
-                disabled={loading}
+                disabled={isSubmitting}
               >
-                {loading ? 'Signing up...' : 'Sign Up'}
+                {isSubmitting ? 'Signing up...' : 'Sign Up'}
               </button>
             </form>
             <div className="flex flex-col gap-1 justify-between items-center mt-6 md:flex-row">

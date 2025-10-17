@@ -1,7 +1,7 @@
 import { MdStar, MdBed } from 'react-icons/md';
 import Loader from '../../../../components/common/Loader';
 
-const HotelDetails = ({ hotel, onEdit, loading }) => {
+const HotelDetails = ({ hotel, onEdit, isLoading }) => {
   const fullAddress = `
   ${hotel.address || ''},
   ${hotel.street || ''},
@@ -44,7 +44,7 @@ const HotelDetails = ({ hotel, onEdit, loading }) => {
   const defaultImageUrl =
     'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
-  if (loading) return <Loader fullScreen={true} />;
+  if (isLoading) return <Loader fullScreen={true} />;
 
   return (
     <article className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">

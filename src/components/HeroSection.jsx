@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { ModalManager } from '../modals/ModalManager';
-import { LoginContext } from '../contexts/LoginProvider/LoginContext';
+import { LoginContext } from '../contexts/ContextCreator';
 
 const homeContent = {
   background: "url('/images/fresh-gourmet-salad-plate.jpg')",

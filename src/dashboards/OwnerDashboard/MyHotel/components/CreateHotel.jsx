@@ -2,13 +2,15 @@ import { useFormik } from 'formik';
 import { MdStar } from 'react-icons/md';
 import { hotelSchema } from '../../../../schemas/YupValidationSchema';
 import API from '../../../../utils/api';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
-import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
+import { SubmittingContext } from '../../../../contexts/ContextCreator';
 
 // isModal: when true, component renders inside a Headless UI Dialog
 const CreateHotel = ({ onCancel, onSubmit }) => {
   const [preview, setPreview] = useState(null);
+  const { isSubmitting, setIsSubmitting } = useContext(SubmittingContext);
+
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -30,8 +32,9 @@ const CreateHotel = ({ onCancel, onSubmit }) => {
     validateOnChange: true,
     validateOnBlur: true,
 
-    onSubmit: async (values, { resetForm, setSubmitting }) => {
+    onSubmit: async (values, { resetForm }) => {
       const { images, ...payload } = values;
+      setIsSubmitting(true);
       try {
         // 1️⃣ Upload image first
         let uploadedImage = null;
@@ -75,7 +78,7 @@ const CreateHotel = ({ onCancel, onSubmit }) => {
         );
         toast.error(error.response?.data?.message || 'Something went wrong');
       } finally {
-        setSubmitting(false);
+        setIsSubmitting(false);
         onCancel();
       }
     },
@@ -89,7 +92,6 @@ const CreateHotel = ({ onCancel, onSubmit }) => {
     handleChange,
     handleSubmit,
     isValid,
-    isSubmitting,
     setFieldValue,
     setFieldTouched,
     setFieldError,
@@ -488,7 +490,7 @@ const CreateHotel = ({ onCancel, onSubmit }) => {
             disabled={!isValid || isSubmitting}
             className="inline-flex flex-1 items-center justify-center rounded-xl bg-(--color-primary) hover:bg-(--color-secondary) px-4 py-2 font-medium text-white shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Create Hotel
+            {isSubmitting ? 'Submitting...' : 'Create Hotel'}
           </button>
         </div>
       </form>

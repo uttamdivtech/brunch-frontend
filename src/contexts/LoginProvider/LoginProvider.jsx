@@ -1,8 +1,8 @@
 // src/contexts/LoginContext.jsx
 import { useState, useEffect } from 'react';
-import { LoginContext } from './LoginContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { LoginContext } from '../ContextCreator';
 
 export const LoginProvider = ({ children }) => {
   const [loggedInUser, setLoggedInUser] = useState(null);

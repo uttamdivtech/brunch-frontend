@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 import { IoClose } from 'react-icons/io5';
 import { useFormik } from 'formik';
 import { menuSchema } from '../../../../schemas/YupValidationSchema';
 import API from '../../../../utils/api';
 import { toast } from 'react-toastify';
+import { SubmittingContext } from '../../../../contexts/ContextCreator';
 
 // Allowed cuisine types from backend
 const allowedTypes = [
@@ -48,6 +49,7 @@ const allowedCategories = ['veg', 'non-veg'];
 
 const CreateEditMenu = ({ isOpen, onClose, mode, item, onSubmit }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
+  const { isSubmitting, setIsSubmitting } = useContext(SubmittingContext);
 
   const formik = useFormik({
     initialValues: {
@@ -64,8 +66,9 @@ const CreateEditMenu = ({ isOpen, onClose, mode, item, onSubmit }) => {
     validationSchema: menuSchema,
     validateOnChange: true,
     validateOnBlur: true,
-    onSubmit: async (values, { setSubmitting, resetForm }) => {
+    onSubmit: async (values, { resetForm }) => {
       if (mode === 'create') {
+        setIsSubmitting(true);
         const { images, ...payload } = values;
         try {
           // 1️⃣ Upload image first
@@ -110,9 +113,10 @@ const CreateEditMenu = ({ isOpen, onClose, mode, item, onSubmit }) => {
           );
           toast.error(error.response?.data?.message || 'Something went wrong');
         } finally {
-          setSubmitting(false);
+          setIsSubmitting(false);
         }
       } else if (mode === 'edit') {
+        setIsSubmitting(true);
         try {
           const { images, ...payload } = values;
 
@@ -163,7 +167,7 @@ const CreateEditMenu = ({ isOpen, onClose, mode, item, onSubmit }) => {
           );
           toast.error(error.response?.data?.message || 'Something went wrong');
         } finally {
-          setSubmitting(false);
+          setIsSubmitting(false);
         }
       }
     },
@@ -180,7 +184,6 @@ const CreateEditMenu = ({ isOpen, onClose, mode, item, onSubmit }) => {
     setFieldError,
     setValues,
     setFieldTouched,
-    isSubmitting,
     resetForm,
   } = formik;
 
@@ -534,8 +537,8 @@ const CreateEditMenu = ({ isOpen, onClose, mode, item, onSubmit }) => {
                   {isSubmitting
                     ? 'Submitting...'
                     : mode === 'create'
-                    ? 'Create'
-                    : 'Update'}
+                    ? 'Create Menu'
+                    : 'Update Menu'}
                 </button>
               </div>
             </form>

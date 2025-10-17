@@ -3,12 +3,12 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect, useContext } from 'react';
 import { ResetPassword } from './modals/ResetPassword';
-import { LoginContext } from './contexts/LoginProvider/LoginContext';
 import Navbar from './components/common/Navbar';
 import PublicRoutes from './routes/PublicRoutes';
 import UserRoutes from './routes/UserRoutes';
 import OwnerRoutes from './routes/OwnerRoutes';
 import { NotFound } from './components/common/NotFound';
+import { LoginContext } from './contexts/ContextCreator';
 
 const App = () => {
   const { setLoggedInUser } = useContext(LoginContext);

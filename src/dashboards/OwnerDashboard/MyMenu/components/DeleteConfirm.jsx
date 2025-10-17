@@ -1,6 +1,12 @@
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 
-const DeleteConfirm = ({ isOpen, onClose, itemName, onConfirm }) => {
+const DeleteConfirm = ({
+  isOpen,
+  onClose,
+  itemName,
+  onConfirm,
+  isSubmitting,
+}) => {
   return (
     <Dialog
       open={isOpen}
@@ -34,9 +40,10 @@ const DeleteConfirm = ({ isOpen, onClose, itemName, onConfirm }) => {
             <button
               type="button"
               onClick={onConfirm}
+              disabled={isSubmitting}
               className="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700"
             >
-              Delete
+              {isSubmitting ? 'Deleting...' : 'Delete'}
             </button>
           </div>
         </DialogPanel>
